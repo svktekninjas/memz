@@ -1,0 +1,6 @@
+::1 - - [15/Aug/2025 23:24:26] "GET / HTTP/1.1" 304 -
+::1 - - [15/Aug/2025 23:24:27] code 404, message File not found
+::1 - - [15/Aug/2025 23:24:27] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+::1 - - [15/Aug/2025 23:33:14] "GET / HTTP/1.1" 304 -
+::1 - - [16/Aug/2025 12:34:46] "GET / HTTP/1.1" 304 -
+::1 - - [16/Aug/2025 12:34:46] "GET /AI_Definitive_transparent_white.png HTTP/1.1" 304 -

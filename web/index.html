@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mem0 AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --header-height: 70px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f7fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            height: var(--header-height);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            border: 2px solid white;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-top: var(--header-height);
+            flex: 1;
+            width: 100%;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 30px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Home Page Styles */
+        .home-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .home-title {
+            font-size: 32px;
+            color: #2d3748;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .home-description {
+            color: #718096;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .query-form {
+            margin-bottom: 30px;
+        }
+
+        .query-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            outline: none;
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        .query-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .submit-btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            display: block;
+            margin: 20px auto 0;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-area {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f7fafc;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .result-area.show {
+            display: block;
+        }
+
+        .result-content {
+            color: #4a5568;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            font-size: 16px;
+        }
+
+        .memories-badge {
+            display: inline-block;
+            background: var(--primary-gradient);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* History Page Styles */
+        .history-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            padding: 40px;
+        }
+
+        .history-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .history-title {
+            font-size: 28px;
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sync-kb-btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .sync-kb-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .sync-kb-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .history-item {
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .history-query {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .history-response {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.6;
+            max-height: 60px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .history-response.expanded {
+            max-height: none;
+        }
+
+        .expand-toggle {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .history-meta {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 10px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        /* Knowledge Base Page Styles */
+        .kb-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            padding: 40px;
+        }
+
+        .kb-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .kb-title {
+            font-size: 28px;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .kb-description {
+            color: #718096;
+            font-size: 16px;
+        }
+
+        .kb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .kb-card {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .kb-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .kb-card-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .kb-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .kb-input {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .kb-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .kb-action-btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            width: 100%;
+        }
+
+        .kb-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .kb-action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .kb-stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .kb-stats-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .kb-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .kb-stat-item {
+            text-align: center;
+        }
+
+        .kb-stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .kb-stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Bar -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="AI_Definitive_transparent_white.png" alt="AI Definitive Logo" class="logo">
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-btn active" onclick="showPage('home')">
+                    Home
+                </button>
+                <button class="nav-btn" onclick="showPage('history')">
+                    History
+                </button>
+                <button class="nav-btn" onclick="showPage('knowledge')">
+                    Knowledge Base
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Home Page -->
+        <div id="homePage" class="page active">
+            <div class="home-container">
+                <h1 class="home-title">Welcome to AIDefinitive Assistant</h1>
+                <p class="home-description">
+                    Ask me anything! I use advanced AI with memory capabilities to provide 
+                    context-aware responses based on our conversation history and knowledge base.
+                </p>
+                
+                <form id="queryForm" class="query-form">
+                    <textarea 
+                        id="userInput" 
+                        class="query-input" 
+                        placeholder="What would you like to know? For example: 'Explain quantum computing' or 'What projects have I worked on?'"
+                        required
+                    ></textarea>
+                    
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        Submit Query
+                    </button>
+                </form>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 15px; color: #718096;">Processing your query...</p>
+                </div>
+                
+                <div class="result-area" id="resultArea">
+                    <div class="result-content" id="resultContent"></div>
+                    <div class="memories-badge" id="memoriesBadge" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Page -->
+        <div id="historyPage" class="page">
+            <div class="history-container">
+                <div class="history-header">
+                    <h1 class="history-title">Query History</h1>
+                    <button class="sync-kb-btn" onclick="syncToKB()" id="syncKBBtn">
+                        Sync to Knowledge Base
+                    </button>
+                </div>
+                
+                <div id="historyContent" class="history-list">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>No queries yet. Start by asking something on the Home page!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Knowledge Base Page -->
+        <div id="knowledgePage" class="page">
+            <div class="kb-container">
+                <div class="kb-header">
+                    <h1 class="kb-title">Knowledge Base Management</h1>
+                    <p class="kb-description">
+                        Ingest various data sources to expand the AI's knowledge and improve response quality.
+                    </p>
+                </div>
+                
+                <div class="kb-grid">
+                    <div class="kb-card">
+                        <div class="kb-card-icon">📁</div>
+                        <h3 class="kb-card-title">Ingest File</h3>
+                        <input type="text" id="filePathInput" class="kb-input" placeholder="/path/to/file">
+                        <button onclick="ingestFile()" class="kb-action-btn">Process File</button>
+                    </div>
+                    
+                    <div class="kb-card">
+                        <div class="kb-card-icon">📂</div>
+                        <h3 class="kb-card-title">Ingest Folder</h3>
+                        <input type="text" id="folderPathInput" class="kb-input" placeholder="/path/to/folder">
+                        <button onclick="ingestFolder()" class="kb-action-btn">Process Folder</button>
+                    </div>
+                    
+                    <div class="kb-card">
+                        <div class="kb-card-icon">🔗</div>
+                        <h3 class="kb-card-title">Git Repository</h3>
+                        <input type="text" id="gitUrlInput" class="kb-input" placeholder="https://github.com/user/repo">
+                        <button onclick="ingestGitRepo()" class="kb-action-btn">Clone & Process</button>
+                    </div>
+                    
+                    <div class="kb-card">
+                        <div class="kb-card-icon">🌐</div>
+                        <h3 class="kb-card-title">Website</h3>
+                        <input type="text" id="websiteUrlInput" class="kb-input" placeholder="https://example.com">
+                        <button onclick="ingestWebsite()" class="kb-action-btn">Crawl Website</button>
+                    </div>
+                </div>
+                
+                <div class="kb-stats" id="kbStats">
+                    <h2 class="kb-stats-title">📊 Knowledge Base Statistics</h2>
+                    <div class="kb-stats-grid">
+                        <div class="kb-stat-item">
+                            <div class="kb-stat-value" id="totalMemories">0</div>
+                            <div class="kb-stat-label">Total Memories</div>
+                        </div>
+                        <div class="kb-stat-item">
+                            <div class="kb-stat-value" id="totalSources">0</div>
+                            <div class="kb-stat-label">Sources</div>
+                        </div>
+                        <div class="kb-stat-item">
+                            <div class="kb-stat-value" id="lastUpdated">Never</div>
+                            <div class="kb-stat-label">Last Updated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = 'http://localhost:5001';
+        const KB_API_URL = 'http://localhost:5002';
+        let sessionCache = [];
+        let currentPage = 'home';
+
+        // Page Navigation
+        function showPage(pageName) {
+            // Update active page
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageName + 'Page').classList.add('active');
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentPage = pageName;
+            
+            // Load page-specific data
+            if (pageName === 'history') {
+                loadHistory();
+            } else if (pageName === 'knowledge') {
+                loadKBStats();
+            }
+        }
+
+        // Query Form Handler
+        document.getElementById('queryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const userInput = document.getElementById('userInput').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const resultArea = document.getElementById('resultArea');
+            const resultContent = document.getElementById('resultContent');
+            const memoriesBadge = document.getElementById('memoriesBadge');
+            
+            if (!userInput) {
+                alert('Please enter a question');
+                return;
+            }
+            
+            // Show loading, disable button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+            loading.classList.add('show');
+            resultArea.classList.remove('show');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/query`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ query: userInput })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Display result
+                    resultContent.textContent = data.response;
+                    
+                    // Show memories badge if memories were used
+                    if (data.memories_used > 0) {
+                        memoriesBadge.textContent = `Used ${data.memories_used} memories`;
+                        memoriesBadge.style.display = 'inline-block';
+                    } else {
+                        memoriesBadge.style.display = 'none';
+                    }
+                    
+                    resultArea.classList.add('show');
+                    
+                    // Clear input
+                    document.getElementById('userInput').value = '';
+                } else {
+                    throw new Error(data.error || 'Failed to process query');
+                }
+                
+            } catch (error) {
+                resultContent.textContent = 'Error: ' + error.message;
+                memoriesBadge.style.display = 'none';
+                resultArea.classList.add('show');
+            } finally {
+                // Reset button and hide loading
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Query';
+                loading.classList.remove('show');
+            }
+        });
+
+        // History Functions
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${API_URL}/api/cache`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                sessionCache = data.cache || [];
+                updateHistoryDisplay();
+            } catch (error) {
+                console.error('Failed to load history:', error);
+            }
+        }
+
+        function updateHistoryDisplay() {
+            const historyContent = document.getElementById('historyContent');
+            
+            if (sessionCache.length === 0) {
+                historyContent.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>No queries yet. Start by asking something on the Home page!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            historyContent.innerHTML = sessionCache.map((item, index) => {
+                const responseLines = item.response.split('\n');
+                const isLong = responseLines.length > 3 || item.response.length > 200;
+                const timestamp = new Date(item.timestamp).toLocaleString();
+                
+                return `
+                    <div class="history-item">
+                        <div class="history-query">Q: ${item.query}</div>
+                        <div class="history-response" id="response-${index}">
+                            ${isLong ? item.response.substring(0, 150) + '...' : item.response}
+                        </div>
+                        ${isLong ? `
+                            <button class="expand-toggle" onclick="toggleExpand(${index})">
+                                Show more ▼
+                            </button>
+                        ` : ''}
+                        <div class="history-meta">
+                            <span>🕒 ${timestamp}</span>
+                            <span>💭 ${item.memories_used || 0} memories used</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleExpand(index) {
+            const responseDiv = document.getElementById(`response-${index}`);
+            const button = responseDiv.nextElementSibling;
+            const item = sessionCache[index];
+            
+            if (responseDiv.classList.contains('expanded')) {
+                responseDiv.textContent = item.response.substring(0, 150) + '...';
+                responseDiv.classList.remove('expanded');
+                button.textContent = 'Show more ▼';
+            } else {
+                responseDiv.textContent = item.response;
+                responseDiv.classList.add('expanded');
+                button.textContent = 'Show less ▲';
+            }
+        }
+
+        async function syncToKB() {
+            const syncBtn = document.getElementById('syncKBBtn');
+            
+            if (sessionCache.length === 0) {
+                alert('No queries to sync');
+                return;
+            }
+            
+            const confirmSync = confirm(`Sync ${sessionCache.length} queries to Knowledge Base?`);
+            if (!confirmSync) return;
+            
+            syncBtn.disabled = true;
+            syncBtn.textContent = 'Syncing...';
+            
+            try {
+                const response = await fetch(`${KB_API_URL}/api/kb/sync-cache`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ cache_entries: sessionCache })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`✅ Successfully synced ${data.synced_count} entries to Knowledge Base`);
+                    if (currentPage === 'knowledge') {
+                        loadKBStats();
+                    }
+                } else {
+                    throw new Error(data.error || 'Sync failed');
+                }
+                
+            } catch (error) {
+                alert('Error syncing to Knowledge Base: ' + error.message);
+            } finally {
+                syncBtn.disabled = false;
+                syncBtn.textContent = 'Sync to Knowledge Base';
+            }
+        }
+
+        // Knowledge Base Functions
+        async function loadKBStats() {
+            try {
+                const response = await fetch(`${KB_API_URL}/api/kb/stats`);
+                const data = await response.json();
+                
+                document.getElementById('totalMemories').textContent = data.total_memories || 0;
+                document.getElementById('totalSources').textContent = data.sources || 0;
+                document.getElementById('lastUpdated').textContent = 
+                    data.last_updated ? new Date(data.last_updated).toLocaleDateString() : 'Never';
+            } catch (error) {
+                console.error('Failed to load KB stats:', error);
+            }
+        }
+
+        async function ingestFile() {
+            const filePath = document.getElementById('filePathInput').value.trim();
+            if (!filePath) {
+                alert('Please enter a file path');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${KB_API_URL}/api/kb/ingest/file`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ file_path: filePath })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert(`✅ Successfully ingested file: ${data.chunks_created} chunks created`);
+                    document.getElementById('filePathInput').value = '';
+                    loadKBStats();
+                } else {
+                    throw new Error(data.error || 'Failed to ingest file');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function ingestFolder() {
+            const folderPath = document.getElementById('folderPathInput').value.trim();
+            if (!folderPath) {
+                alert('Please enter a folder path');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${KB_API_URL}/api/kb/ingest/folder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ folder_path: folderPath })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert(`✅ Successfully ingested folder: ${data.files_processed} files, ${data.total_chunks} chunks created`);
+                    document.getElementById('folderPathInput').value = '';
+                    loadKBStats();
+                } else {
+                    throw new Error(data.error || 'Failed to ingest folder');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function ingestGitRepo() {
+            const repoUrl = document.getElementById('gitUrlInput').value.trim();
+            if (!repoUrl) {
+                alert('Please enter a Git repository URL');
+                return;
+            }
+            
+            alert('⏳ Cloning and processing repository... This may take a moment.');
+            
+            try {
+                const response = await fetch(`${KB_API_URL}/api/kb/ingest/git`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ repo_url: repoUrl })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert(`✅ Successfully ingested repository: ${data.files_processed} files, ${data.total_chunks} chunks created`);
+                    document.getElementById('gitUrlInput').value = '';
+                    loadKBStats();
+                } else {
+                    throw new Error(data.error || 'Failed to ingest repository');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function ingestWebsite() {
+            const websiteUrl = document.getElementById('websiteUrlInput').value.trim();
+            if (!websiteUrl) {
+                alert('Please enter a website URL');
+                return;
+            }
+            
+            alert('⏳ Crawling website... This may take a moment.');
+            
+            try {
+                const response = await fetch(`${KB_API_URL}/api/kb/ingest/website`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: websiteUrl, max_depth: 2 })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert(`✅ Successfully ingested website: ${data.pages_processed} pages, ${data.chunks_created} chunks created`);
+                    document.getElementById('websiteUrlInput').value = '';
+                    loadKBStats();
+                } else {
+                    throw new Error(data.error || 'Failed to ingest website');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Auto-resize textarea
+        document.getElementById('userInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 300) + 'px';
+        });
+
+        // Load initial data
+        window.addEventListener('load', () => {
+            if (currentPage === 'history') {
+                loadHistory();
+            } else if (currentPage === 'knowledge') {
+                loadKBStats();
+            }
+        });
+    </script>
+</body>
+</html>

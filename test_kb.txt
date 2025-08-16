@@ -1,0 +1,14 @@
+This is a test file for the Knowledge Base system.
+
+It contains several paragraphs of text to ensure that the system can properly process and chunk content.
+
+The Knowledge Base should be able to:
+1. Read this file
+2. Extract the content
+3. Split it into chunks if necessary
+4. Store it in the vector database
+5. Make it searchable
+
+This is another paragraph with some technical information. The system uses embeddings to convert text into vector representations that can be searched semantically.
+
+Final paragraph to test the chunking algorithm and ensure everything is working correctly with the Knowledge Base ingestion process.

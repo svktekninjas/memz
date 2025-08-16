@@ -1,0 +1,6 @@
+flask==3.0.0
+flask-cors==4.0.0
+mem0ai
+openai
+python-dotenv
+qdrant-client

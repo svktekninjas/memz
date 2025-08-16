@@ -1,0 +1,132 @@
+Starting Knowledge Base API...
+API will be available at: http://localhost:5002
+ * Serving Flask app 'kb_api'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5002
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 791-795-248
+127.0.0.1 - - [15/Aug/2025 23:24:54] "POST /api/kb/search HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:25:04] "OPTIONS /api/kb/sync-cache HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:25:05] "POST /api/kb/sync-cache HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:25:13] "GET /api/kb/stats HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:28:10] "OPTIONS /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:28:10] "POST /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:32:24] "OPTIONS /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:32:25] "POST /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:32:28] "GET /api/kb/stats HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:32:48] "OPTIONS /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:32:49] "POST /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:32:51] "GET /api/kb/stats HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:33:17] "GET /api/kb/stats HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:34:50] "GET /api/kb/stats HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:34:57] "GET /api/kb/stats HTTP/1.1" 200 -
+ * Detected change in '/Users/swaroop/MEMZ/utils/check_memories.py', reloading
+Starting Knowledge Base API...
+API will be available at: http://localhost:5002
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 791-795-248
+127.0.0.1 - - [15/Aug/2025 23:40:14] "OPTIONS /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:40:16] "POST /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:40:51] "GET /api/kb/stats HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:41:01] "GET /api/kb/stats HTTP/1.1" 200 -
+ * Detected change in '/Users/swaroop/MEMZ/KnowledgeB/kb_api.py', reloading
+Starting Knowledge Base API...
+API will be available at: http://localhost:5002
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 791-795-248
+ * Detected change in '/Users/swaroop/MEMZ/KnowledgeB/knowledge_base.py', reloading
+Starting Knowledge Base API...
+API will be available at: http://localhost:5002
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 791-795-248
+127.0.0.1 - - [15/Aug/2025 23:43:29] "OPTIONS /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:43:31] "POST /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:43:34] "GET /api/kb/stats HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:43:50] "OPTIONS /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:43:51] "POST /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:44:37] "GET /api/kb/stats HTTP/1.1" 200 -
+ * Detected change in '/Users/swaroop/MEMZ/KnowledgeB/knowledge_base.py', reloading
+Starting Knowledge Base API...
+API will be available at: http://localhost:5002
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 791-795-248
+127.0.0.1 - - [15/Aug/2025 23:47:03] "GET /api/kb/stats HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:47:19] "GET /api/kb/stats HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:49:47] "POST /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:50:43] "GET /api/kb/stats HTTP/1.1" 200 -
+ * Detected change in '/Users/swaroop/MEMZ/KnowledgeB/knowledge_base.py', reloading
+Starting Knowledge Base API...
+API will be available at: http://localhost:5002
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 791-795-248
+ * Detected change in '/Users/swaroop/MEMZ/KnowledgeB/knowledge_base.py', reloading
+Starting Knowledge Base API...
+API will be available at: http://localhost:5002
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 791-795-248
+ * Detected change in '/Users/swaroop/MEMZ/KnowledgeB/knowledge_base.py', reloading
+Starting Knowledge Base API...
+API will be available at: http://localhost:5002
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 791-795-248
+127.0.0.1 - - [15/Aug/2025 23:52:40] "POST /api/kb/ingest/file HTTP/1.1" 200 -
+ * Detected change in '/Users/swaroop/MEMZ/KnowledgeB/knowledge_base.py', reloading
+Starting Knowledge Base API...
+API will be available at: http://localhost:5002
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 791-795-248
+127.0.0.1 - - [15/Aug/2025 23:54:15] "OPTIONS /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:54:16] "POST /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:54:18] "GET /api/kb/stats HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:54:50] "POST /api/kb/ingest/file HTTP/1.1" 200 -
+ * Detected change in '/Users/swaroop/MEMZ/KnowledgeB/knowledge_base.py', reloading
+Starting Knowledge Base API...
+API will be available at: http://localhost:5002
+Memory add result: {'results': []}
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 791-795-248
+127.0.0.1 - - [15/Aug/2025 23:55:59] "POST /api/kb/ingest/file HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:56:13] "GET /api/kb/stats HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:56:47] "POST /api/kb/search HTTP/1.1" 200 -
+127.0.0.1 - - [15/Aug/2025 23:59:03] "POST /api/kb/search HTTP/1.1" 200 -
+127.0.0.1 - - [16/Aug/2025 00:00:12] "POST /api/kb/search HTTP/1.1" 200 -
+127.0.0.1 - - [16/Aug/2025 00:00:51] "POST /api/kb/search HTTP/1.1" 200 -
+127.0.0.1 - - [16/Aug/2025 12:34:43] "GET /api/kb/stats HTTP/1.1" 200 -
+127.0.0.1 - - [16/Aug/2025 12:34:49] "GET /api/kb/stats HTTP/1.1" 200 -
+ * Detected change in '/Users/swaroop/MEMZ/KnowledgeB/knowledge_base.py', reloading
+Starting Knowledge Base API...
+API will be available at: http://localhost:5002
+Memory add result: {'results': []}
+Memory add result: {'results': []}
+Memory add result: {'results': []}
+Memory add result: {'results': []}
+Memory add result: {'results': []}
+Memory add result: {'results': []}
+Memory add result: {'results': []}
+Memory add result: {'results': []}
+Memory add result: {'results': []}
+Memory add result: {'results': []}
+Memory add result: {'results': []}
+Memory add result: {'results': []}
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 791-795-248
+ * Detected change in '/Users/swaroop/MEMZ/backend/app.py', reloading
+Starting Knowledge Base API...
+API will be available at: http://localhost:5002
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 791-795-248
+127.0.0.1 - - [16/Aug/2025 14:32:31] "POST /api/kb/search HTTP/1.1" 200 -

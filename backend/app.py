@@ -61,7 +61,7 @@ class Mem0Backend:
                 "config": {
                     "collection_name": "web_memories",
                     "embedding_model_dims": 1536,
-                    "path": "../qdrant_storage"  # Use existing storage
+                    "path": "/Users/swaroop/MEMZ/memQuadrents/qdrant_storage"  # Use absolute path
                 }
             }
         }
@@ -107,11 +107,22 @@ class Mem0Backend:
             )
             if kb_response.status_code == 200:
                 kb_data = kb_response.json()
+                print(f"KB API response structure: {list(kb_data.keys())}")
                 if 'results' in kb_data:
-                    knowledge = [r.get('memory', '') for r in kb_data['results'] if 'memory' in r]
-                    print(f"Found {len(knowledge)} knowledge base entries")
-        except:
+                    # Handle nested results structure
+                    results = kb_data['results']
+                    print(f"Results type: {type(results)}")
+                    if isinstance(results, dict) and 'results' in results:
+                        results = results['results']
+                        print(f"Extracted nested results, count: {len(results)}")
+                    if isinstance(results, list):
+                        knowledge = [r.get('memory', '') for r in results if isinstance(r, dict) and 'memory' in r]
+                        print(f"Found {len(knowledge)} knowledge base entries")
+                    else:
+                        print(f"Results not a list, type: {type(results)}")
+        except Exception as e:
             # KB service might not be running, continue without it
+            print(f"KB search error: {e}")
             pass
         
         # Step 3: Add memories and knowledge to prompt
@@ -167,7 +178,9 @@ If no context is available, respond normally."""
             return {
                 "response": ai_response,
                 "memories_used": len(memories),
-                "context": memories[:3] if memories else []
+                "knowledge_used": len(knowledge),
+                "context": memories[:3] if memories else [],
+                "knowledge_context": knowledge[:3] if knowledge else []
             }
             
         except Exception as e:
@@ -212,7 +225,8 @@ def handle_query():
         "timestamp": datetime.now().isoformat(),
         "query": query,
         "response": result['response'],
-        "memories_used": result['memories_used']
+        "memories_used": result['memories_used'],
+        "knowledge_used": result.get('knowledge_used', 0)
     }
     session_cache[session_id].append(cache_entry)
     
@@ -225,7 +239,9 @@ def handle_query():
         "query": query,
         "response": result['response'],
         "memories_used": result['memories_used'],
+        "knowledge_used": result.get('knowledge_used', 0),
         "context": result['context'],
+        "knowledge_context": result.get('knowledge_context', []),
         "cache_id": cache_entry['id']
     })
 

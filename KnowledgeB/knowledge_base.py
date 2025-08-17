@@ -24,6 +24,8 @@ import markdown
 from mem0 import Memory
 from openai import OpenAI
 from dotenv import load_dotenv
+from qdrant_client import QdrantClient
+from qdrant_client.models import Filter, FieldCondition, MatchValue
 
 load_dotenv()
 
@@ -56,13 +58,19 @@ class KnowledgeBaseService:
                 "config": {
                     "collection_name": "kb_memories",
                     "embedding_model_dims": 1536,
-                    "path": "../qdrant_storage"
+                    "path": "/Users/swaroop/MEMZ/memQuadrents/qdrant_storage"
                 }
             }
         }
         
         self.memory = Memory.from_config(self.config)
         self.processed_hashes = set()  # Track processed content to avoid duplicates
+        self.stats_cache = {
+            "total_chunks": 0,
+            "sources": {},
+            "unique_sources": 0,
+            "total_memories": 0
+        }  # Cache stats since mem0 get_all has issues
     
     def process_local_file(self, file_path: str) -> Dict[str, Any]:
         """Process a single local file"""
@@ -81,8 +89,8 @@ class KnowledgeBaseService:
         }
         
         try:
-            if file_type in ['.txt', '.md', '.json', '.py', '.js', '.html', '.css', '.yml', '.yaml']:
-                # Text files
+            if file_type in ['.txt', '.md', '.json', '.py', '.js', '.html', '.css', '.yml', '.yaml', '.tf', '.tfvars']:
+                # Text files (including Terraform files)
                 with open(path, 'r', encoding='utf-8', errors='ignore') as f:
                     content = f.read()
                     
@@ -118,6 +126,13 @@ class KnowledgeBaseService:
                     print(f"Memory add result: {result}")  # Debug output
                     self.processed_hashes.add(content_hash)
                     stored_count += 1
+                    
+                    # Update stats cache
+                    self.stats_cache["total_chunks"] += 1
+                    self.stats_cache["total_memories"] += 1
+                    source_key = str(path)
+                    self.stats_cache["sources"][source_key] = self.stats_cache["sources"].get(source_key, 0) + 1
+                    self.stats_cache["unique_sources"] = len(self.stats_cache["sources"])
             
             return {
                 "success": True,
@@ -138,7 +153,7 @@ class KnowledgeBaseService:
             return {"error": f"Folder not found: {folder_path}"}
         
         if extensions is None:
-            extensions = ['.txt', '.md', '.pdf', '.docx', '.py', '.js', '.json', '.html', '.css']
+            extensions = ['.txt', '.md', '.pdf', '.docx', '.py', '.js', '.json', '.html', '.css', '.tf', '.tfvars', '.yml', '.yaml']
         
         results = []
         for file_path in path.rglob('*'):
@@ -305,39 +320,60 @@ class KnowledgeBaseService:
         return results
     
     def get_knowledge_stats(self) -> Dict[str, Any]:
-        """Get statistics about the knowledge base"""
+        """Get statistics about the knowledge base from cache"""
         
-        all_memories = self.memory.get_all(user_id="knowledge_base")
-        
-        # Handle different response formats from mem0
-        memories = []
-        if hasattr(all_memories, '__len__'):
-            # Direct list/array response
-            memories = all_memories if isinstance(all_memories, list) else []
-        elif isinstance(all_memories, dict) and 'results' in all_memories:
-            # Dictionary with results key
-            memories = all_memories['results']
-        
-        if memories:
-            # Analyze sources
-            sources = {}
-            for mem in memories:
-                if isinstance(mem, dict) and 'metadata' in mem:
-                    source = mem['metadata'].get('source', 'unknown')
-                    sources[source] = sources.get(source, 0) + 1
-            
-            return {
-                "total_chunks": len(memories),
-                "sources": sources,
-                "unique_sources": len(sources),
-                "total_memories": len(memories)
+        # Get web memories count (conversation memories)
+        web_memories_count = 0
+        try:
+            # Create a separate Memory instance for web_memories collection
+            web_config = {
+                "llm": self.config["llm"],
+                "embedder": self.config["embedder"],
+                "vector_store": {
+                    "provider": "qdrant",
+                    "config": {
+                        "collection_name": "web_memories",
+                        "embedding_model_dims": 1536,
+                        "path": "/Users/swaroop/MEMZ/memQuadrents/qdrant_storage"
+                    }
+                }
             }
+            from mem0 import Memory
+            web_memory = Memory.from_config(web_config)
+            web_memories = web_memory.get_all(user_id="web_user")
+            web_memories_count = len(web_memories) if web_memories else 0
+        except Exception as e:
+            print(f"Error getting web memories: {e}")
+            web_memories_count = 0
+        
+        # Parse sources to categorize them
+        source_types = {
+            "files": [],
+            "folders": [],
+            "repos": [],
+            "websites": []
+        }
+        
+        for source in self.stats_cache.get("sources", {}):
+            if source.endswith('.pdf') or source.endswith('.txt') or source.endswith('.md'):
+                source_types["files"].append(source)
+            elif source.startswith('http://') or source.startswith('https://'):
+                if 'github.com' in source or 'gitlab.com' in source:
+                    source_types["repos"].append(source)
+                else:
+                    source_types["websites"].append(source)
+            elif '/' in source and not source.startswith('/'):
+                source_types["repos"].append(source)
+            else:
+                source_types["folders"].append(source)
         
         return {
-            "total_chunks": 0,
-            "sources": {},
-            "unique_sources": 0,
-            "total_memories": 0
+            "kb_chunks": self.stats_cache.get("total_chunks", 0),
+            "web_memories": web_memories_count,
+            "total_memories": self.stats_cache.get("total_memories", 0),
+            "unique_sources": self.stats_cache.get("unique_sources", 0),
+            "sources": self.stats_cache.get("sources", {}),
+            "source_types": source_types
         }
     
     def sync_cache_to_knowledge(self, cache_entries: List[Dict[str, Any]]) -> Dict[str, Any]:

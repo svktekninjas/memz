@@ -46,7 +46,7 @@ def check_memories():
             "config": {
                 "collection_name": "web_memories",
                 "embedding_model_dims": 1536,
-                "path": "qdrant_storage"
+                "path": "/Users/swaroop/MEMZ/memQuadrents/qdrant_storage"
             }
         }
     }
@@ -81,6 +81,7 @@ def check_memories():
     try:
         kb_config = base_config.copy()
         kb_config['vector_store']['config']['collection_name'] = 'kb_memories'
+        kb_config['vector_store']['config']['path'] = '/Users/swaroop/MEMZ/memQuadrents/qdrant_storage'
         
         kb_memory = Memory.from_config(kb_config)
         kb_memories = kb_memory.get_all(user_id="knowledge_base")

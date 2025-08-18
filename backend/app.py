@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Mem0 Backend API with Session Cache
+Mem0 Backend API with Session Cache and TruLens Evaluation
 Handles user queries with memory context and session history
 """
 
@@ -13,6 +13,16 @@ from flask_cors import CORS, cross_origin
 from mem0 import Memory
 from openai import OpenAI
 from dotenv import load_dotenv
+
+# Import TruLens evaluation
+try:
+    import sys
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from evaluation.trulens_eval import MemzEvaluator, MemzRAGTriad
+    TRULENS_ENABLED = True
+except ImportError:
+    print("TruLens not available - running without evaluation")
+    TRULENS_ENABLED = False
 
 # Load environment variables
 load_dotenv()
@@ -194,6 +204,11 @@ If no context is available, respond normally."""
 # Initialize backend
 backend = Mem0Backend()
 
+# Initialize TruLens evaluator if available
+if TRULENS_ENABLED:
+    evaluator = MemzEvaluator()
+    rag_evaluator = MemzRAGTriad(evaluator)
+
 @app.route('/api/query', methods=['POST', 'OPTIONS'])
 @cross_origin(supports_credentials=True)
 def handle_query():
@@ -219,6 +234,26 @@ def handle_query():
     # Process the query
     result = backend.process_query(query, session_id)
     
+    # Perform TruLens evaluation if enabled
+    if TRULENS_ENABLED:
+        try:
+            # Basic evaluations
+            evaluations = evaluator.evaluate_query(query, result)
+            
+            # RAG Triad evaluation
+            rag_scores = rag_evaluator.evaluate_rag_triad(query, result)
+            evaluations.update(rag_scores)
+            
+            # Log results
+            evaluator.log_evaluation(query, result, evaluations)
+            
+            # Add evaluation scores to result
+            result['evaluation_scores'] = evaluations
+            
+        except Exception as e:
+            print(f"TruLens evaluation error: {e}")
+            result['evaluation_scores'] = {}
+    
     # Add to session cache
     cache_entry = {
         "id": str(uuid.uuid4()),
@@ -226,7 +261,8 @@ def handle_query():
         "query": query,
         "response": result['response'],
         "memories_used": result['memories_used'],
-        "knowledge_used": result.get('knowledge_used', 0)
+        "knowledge_used": result.get('knowledge_used', 0),
+        "evaluation_scores": result.get('evaluation_scores', {})
     }
     session_cache[session_id].append(cache_entry)
     
@@ -284,8 +320,89 @@ def health_check():
     return jsonify({
         "status": "healthy",
         "has_openai_key": bool(os.getenv("OPENAI_API_KEY")),
-        "session_active": 'session_id' in session
+        "session_active": 'session_id' in session,
+        "trulens_enabled": TRULENS_ENABLED
     })
+
+@app.route('/api/evaluation/dashboard', methods=['GET', 'OPTIONS'])
+@cross_origin(supports_credentials=True)
+def launch_evaluation_dashboard():
+    if request.method == 'OPTIONS':
+        return jsonify({"status": "ok"}), 200
+    """Launch TruLens evaluation dashboard"""
+    
+    if not TRULENS_ENABLED:
+        return jsonify({"error": "TruLens not enabled"}), 400
+    
+    try:
+        # Launch dashboard in background
+        import threading
+        def run_dashboard():
+            evaluator.launch_dashboard()
+        
+        thread = threading.Thread(target=run_dashboard, daemon=True)
+        thread.start()
+        
+        return jsonify({
+            "success": True,
+            "message": "TruLens dashboard launching",
+            "url": "http://localhost:8501"
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/evaluation/metrics', methods=['GET', 'OPTIONS'])
+@cross_origin(supports_credentials=True)
+def get_evaluation_metrics():
+    if request.method == 'OPTIONS':
+        return jsonify({"status": "ok"}), 200
+    """Get recent evaluation metrics"""
+    
+    if not TRULENS_ENABLED:
+        return jsonify({"error": "TruLens not enabled"}), 400
+    
+    try:
+        # Read recent evaluation logs
+        import os
+        if os.path.exists("evaluation_logs.jsonl"):
+            logs = []
+            with open("evaluation_logs.jsonl", 'r') as f:
+                for line in f:
+                    logs.append(json.loads(line))
+            
+            # Get last 10 evaluations
+            recent_logs = logs[-10:] if len(logs) > 10 else logs
+            
+            # Calculate averages
+            if recent_logs:
+                avg_scores = {}
+                score_counts = {}
+                
+                for log in recent_logs:
+                    for metric, score in log.get('evaluations', {}).items():
+                        if metric not in avg_scores:
+                            avg_scores[metric] = 0
+                            score_counts[metric] = 0
+                        avg_scores[metric] += score
+                        score_counts[metric] += 1
+                
+                for metric in avg_scores:
+                    avg_scores[metric] = avg_scores[metric] / score_counts[metric]
+                
+                return jsonify({
+                    "recent_evaluations": recent_logs,
+                    "average_scores": avg_scores,
+                    "total_evaluations": len(logs)
+                })
+        
+        return jsonify({
+            "recent_evaluations": [],
+            "average_scores": {},
+            "total_evaluations": 0
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     print("Starting Mem0 Backend API...")

@@ -68,6 +68,28 @@ def ingest_folder():
     result = kb_service.process_folder(folder_path, extensions)
     return jsonify(result)
 
+@app.route('/api/kb/ingest/directory', methods=['POST', 'OPTIONS'])
+@cross_origin(supports_credentials=True)
+def ingest_directory():
+    """Recursively ingest all files in a directory into knowledge base"""
+    if request.method == 'OPTIONS':
+        return jsonify({"status": "ok"}), 200
+    
+    data = request.json
+    directory = data.get('directory')
+    extensions = data.get('extensions', ['.txt', '.md', '.py', '.js', '.tf', '.tfvars', '.yml', '.yaml'])
+    recursive = data.get('recursive', True)
+    
+    if not directory:
+        return jsonify({"error": "No directory path provided"}), 400
+    
+    if not os.path.exists(directory):
+        return jsonify({"error": f"Directory not found: {directory}"}), 404
+    
+    # Process directory recursively
+    result = kb_service.process_directory_recursive(directory, extensions, recursive)
+    return jsonify(result)
+
 @app.route('/api/kb/ingest/git', methods=['POST', 'OPTIONS'])
 @cross_origin(supports_credentials=True)
 def ingest_git_repo():

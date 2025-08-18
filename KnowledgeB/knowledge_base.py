@@ -145,6 +145,10 @@ class KnowledgeBaseService:
         except Exception as e:
             return {"error": f"Failed to process file: {str(e)}"}
     
+    def process_directory_recursive(self, directory: str, extensions: List[str] = None, recursive: bool = True) -> Dict[str, Any]:
+        """Process all files in a directory with optional recursion"""
+        return self.process_folder(directory, extensions)
+    
     def process_folder(self, folder_path: str, extensions: List[str] = None) -> Dict[str, Any]:
         """Process all files in a folder recursively"""
         

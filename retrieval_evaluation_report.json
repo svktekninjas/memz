@@ -1,0 +1,195 @@
+{
+  "timestamp": "2025-08-17 14:28:25",
+  "results": [
+    {
+      "test_case": {
+        "query": "What is the tag name for aws_internet_gateway resource?",
+        "expected_content": [
+          "aws_internet_gateway",
+          "KS-IG",
+          "Name"
+        ],
+        "expected_answer": "KS-IG",
+        "test_type": "exact_resource_retrieval"
+      },
+      "actual_response": {
+        "cache_id": "2c72eec5-faee-48a8-94b3-1e34b34853f5",
+        "context": [],
+        "knowledge_context": [
+          "From main.tf: # Elastic IP for NAT Gateway",
+          "From main.tf: # Elastic IP for NAT Gateway",
+          "Variable 'public_subnet_id' - Description: 'Public subnet ID for NAT Gateway'"
+        ],
+        "knowledge_used": 3,
+        "memories_used": 0,
+        "query": "What is the tag name for aws_internet_gateway resource?",
+        "response": "The tag name for the `aws_internet_gateway` resource isn't provided in the context you've shared. Typically, you would define tags in the resource block within your Terraform configuration. If you have access to the full `main.tf` file, you can look for the `tags` argument within the `aws_internet_gateway` resource to find the specific tag name being used. If you need help with a specific configuration or example, feel free to share more details!",
+        "success": true
+      },
+      "evaluation": {
+        "semantic_similarity": 0.8,
+        "factual_accuracy": 0.0,
+        "retrieval_precision": 0.5,
+        "retrieval_recall": 0.0,
+        "response_correctness": 0.0,
+        "expected_found": [],
+        "expected_missing": [
+          "aws_internet_gateway",
+          "KS-IG",
+          "Name"
+        ],
+        "false_positives": [
+          "NAT Gateway retrieved instead of Internet Gateway"
+        ],
+        "chunks_retrieved": 3
+      }
+    },
+    {
+      "test_case": {
+        "query": "What is the tag name for NAT Gateway?",
+        "expected_content": [
+          "nat_gateway",
+          "NAT",
+          "elastic_ip"
+        ],
+        "expected_answer": "NAT Gateway tag",
+        "test_type": "similar_resource_retrieval"
+      },
+      "actual_response": {
+        "cache_id": "ce0ea4fd-40a9-4e89-a640-058a78c657fe",
+        "context": [],
+        "knowledge_context": [
+          "Private route to NAT Gateway",
+          "Private route to NAT Gateway",
+          "Variable 'public_subnet_id' - Description: 'Public subnet ID for NAT Gateway'"
+        ],
+        "knowledge_used": 3,
+        "memories_used": 0,
+        "query": "What is the tag name for NAT Gateway?",
+        "response": "The tag name for a NAT Gateway is typically not specified directly in the provided information. However, in AWS, NAT Gateways often have tags like \"Name\" or \"Environment\" to help identify them. If you're looking for a specific tag name used in a particular configuration or setup, please provide more details, and I can assist you further!",
+        "success": true
+      },
+      "evaluation": {
+        "semantic_similarity": 0.8,
+        "factual_accuracy": 0.0,
+        "retrieval_precision": 1.0,
+        "retrieval_recall": 0.3333333333333333,
+        "response_correctness": 0.0,
+        "expected_found": [
+          "NAT"
+        ],
+        "expected_missing": [
+          "nat_gateway",
+          "elastic_ip"
+        ],
+        "false_positives": [],
+        "chunks_retrieved": 3
+      }
+    },
+    {
+      "test_case": {
+        "query": "Show me the Internet Gateway configuration",
+        "expected_content": [
+          "aws_internet_gateway",
+          "vpc_id",
+          "tags"
+        ],
+        "expected_answer": "Internet Gateway with tag KS-IG",
+        "test_type": "configuration_retrieval"
+      },
+      "actual_response": {
+        "cache_id": "570922a2-4acf-4e9a-b643-f3951cefeceb",
+        "context": [],
+        "knowledge_context": [
+          "Private route to NAT Gateway",
+          "Private route to NAT Gateway",
+          "From main.tf: # Elastic IP for NAT Gateway"
+        ],
+        "knowledge_used": 3,
+        "memories_used": 0,
+        "query": "Show me the Internet Gateway configuration",
+        "response": "To configure an Internet Gateway in Terraform, you'll typically include a resource block that defines the Internet Gateway and associates it with your VPC. Here's an example configuration:\n\n```hcl\nresource \"aws_internet_gateway\" \"example\" {\n  vpc_id = aws_vpc.example.id\n\n  tags = {\n    Name = \"example-internet-gateway\"\n  }\n}\n\nresource \"aws_route_table\" \"public\" {\n  vpc_id = aws_vpc.example.id\n\n  route {\n    cidr_block = \"0.0.0.0/0\"\n    gateway_id = aws_internet_gateway.example.id\n  }\n\n  tags = {\n    Name = \"public-route-table\"\n  }\n}\n\nresource \"aws_route_table_association\" \"public\" {\n  subnet_id      = aws_subnet.public_subnet.id\n  route_table_id = aws_route_table.public.id\n}\n```\n\nIn this configuration:\n- An Internet Gateway is created and associated with a specified VPC.\n- A route table is defined with a route that directs all outbound internet traffic (0.0.0.0/0) to the Internet Gateway.\n- The route table is then associated with a public subnet.\n\nMake sure to replace `aws_vpc.example.id` and `aws_subnet.public_subnet.id` with your actual VPC and subnet resource references. If you have specific requirements or additional context, please let me know!",
+        "success": true
+      },
+      "evaluation": {
+        "semantic_similarity": 0.8,
+        "factual_accuracy": 0.0,
+        "retrieval_precision": 1.0,
+        "retrieval_recall": 0.0,
+        "response_correctness": 0.0,
+        "expected_found": [],
+        "expected_missing": [
+          "aws_internet_gateway",
+          "vpc_id",
+          "tags"
+        ],
+        "false_positives": [],
+        "chunks_retrieved": 3
+      }
+    },
+    {
+      "test_case": {
+        "query": "What VPC CIDR is configured?",
+        "expected_content": [
+          "vpc_cidr",
+          "10.0.0.0/16"
+        ],
+        "expected_answer": "10.0.0.0/16",
+        "test_type": "parameter_retrieval"
+      },
+      "actual_response": {
+        "cache_id": "e94de910-3555-4115-bec8-751b040b2654",
+        "context": [],
+        "knowledge_context": [
+          "Variable vpc_cidr: VPC CIDR block range, Type: string",
+          "Variable vpc_cidr: VPC CIDR block range, Type: string",
+          "Variable 'vpc_id' - Description: 'VPC ID for Aurora DB'"
+        ],
+        "knowledge_used": 3,
+        "memories_used": 0,
+        "query": "What VPC CIDR is configured?",
+        "response": "The configured VPC CIDR block is specified by the variable `vpc_cidr`. However, the specific CIDR value isn't provided in the context. If you have access to the relevant configuration or code, you can check the value assigned to `vpc_cidr` for the exact CIDR range.",
+        "success": true
+      },
+      "evaluation": {
+        "semantic_similarity": 0.8,
+        "factual_accuracy": 0.0,
+        "retrieval_precision": 1.0,
+        "retrieval_recall": 0.5,
+        "response_correctness": 0.0,
+        "expected_found": [
+          "vpc_cidr"
+        ],
+        "expected_missing": [
+          "10.0.0.0/16"
+        ],
+        "false_positives": [],
+        "chunks_retrieved": 3
+      }
+    }
+  ],
+  "report": {
+    "total_tests": 4,
+    "vector_limitation_demonstrated": true,
+    "average_metrics": {
+      "retrieval_recall": 0.20833333333333331,
+      "retrieval_precision": 0.875,
+      "factual_accuracy": 0.0,
+      "response_correctness": 0.0
+    },
+    "specific_issues": [
+      {
+        "query": "What is the tag name for aws_internet_gateway resource?",
+        "issue": "Retrieved semantically similar but factually incorrect content",
+        "details": [
+          "NAT Gateway retrieved instead of Internet Gateway"
+        ]
+      }
+    ],
+    "recommendations": [
+      "Implement fact-checking layer to validate retrieved content",
+      "Use hybrid search (vector + keyword) to improve accuracy",
+      "Add entity recognition to distinguish between similar resources"
+    ]
+  }
+}
